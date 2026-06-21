@@ -26,10 +26,17 @@ def home():
 
 @app.route("/callback", methods=["POST"])
 def callback():
-    signature = request.headers["X-Line-Signature"]
-    body = request.get_data(as_text=True)
-    handler.handle(body, signature)
-    return "OK"
+    try:
+        signature = request.headers["X-Line-Signature"]
+        body = request.get_data(as_text=True)
+
+        handler.handle(body, signature)
+
+        return "OK", 200
+
+    except Exception as e:
+        print("callback 錯誤：", e)
+        return "OK", 200
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
