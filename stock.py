@@ -4,26 +4,36 @@ watchlist = ["^TWII","2330","0050","00631L","2327","2383","3532","2303","2344"]
 
 def get_stock_price(stock_id):
     if stock_id == "^TWII":
-        stock = yf.Ticker("^TWII")
+        symbol = "^TWII"
     else:
-        stock = yf.Ticker(stock_id + ".TW")
-    data = stock.history(period="2d")
+        symbol = stock_id + ".TW"
 
-    if len(data) < 2:
+    try:
+        stock = yf.Ticker(symbol)
+        current = float(stock.fast_info["lastPrice"])
+        previous = float(stock.fast_info["previousClose"])
+        percent = ((current - previous) / previous) * 100
+
+        return {
+            "price": round(current, 2),
+            "percent": round(percent, 2)
+        }
+
+    except Exception as e:
+        print(f"{stock_id} 查詢失敗：{e}")
         return None
-    current = float(data["Close"].iloc[-1])
-    previous = float(data["Close"].iloc[-2])
 
-    percent = ((current - previous) / previous) * 100
 
-    return {
-        "price": round(current, 2),
-        "percent": round(percent, 2)
-    }
 def report_watchlist():
     result_text = ""
+
     for stock in watchlist:
         result = get_stock_price(stock)
+
+        if result is None:
+            result_text += f"{stock}\n查詢失敗\n\n"
+            continue
+
         result_text += (
             f"{stock}\n"
             f"股價：{result['price']}\n"
