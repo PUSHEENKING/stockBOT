@@ -59,3 +59,15 @@ def handle_message(event):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
+msg = user_message.lower()
+
+if msg == "watchlist":
+    reply = "📌 自選股\n\n"
+
+    for stock in watchlist:
+        price = get_stock_price(stock)  # 你原本查2330的function
+        reply += f"{stock} {price}\n"
+
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
+    return
