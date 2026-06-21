@@ -41,10 +41,14 @@ def callback():
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     text = event.message.text.strip()
-    if text.lower() == "report":
+    msg = text.lower()
+
+    if msg == "watchlist":
         reply_text = report_watchlist()
+
     else:
         result = get_stock_price(text)
+
         if result:
             reply_text = (
                 f"{text}\n"
@@ -52,7 +56,8 @@ def handle_message(event):
                 f"漲跌幅：{result['percent']}%"
             )
         else:
-            reply_text = "查無資料"
+            reply_text = "查無資料，請輸入股票代碼，例如：2330，或輸入 watchlist"
+
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message(
@@ -63,7 +68,6 @@ def handle_message(event):
                 ]
             )
         )
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
