@@ -11,7 +11,7 @@ def get_stock_price(stock_id):
     try:
         stock = yf.Ticker(symbol)
         current = float(stock.fast_info["lastPrice"])
-        previous = float(stock.fast_info["previousClose"])
+        previous = float(stock.fast_info["regularMarketPreviousClose"])
         percent = ((current - previous) / previous) * 100
 
         return {
