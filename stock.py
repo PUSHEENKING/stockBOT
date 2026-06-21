@@ -1,6 +1,10 @@
 import yfinance as yf
 
-watchlist = ["^TWII","2330","0050","00631L","2327","2383","3532","2303","2344"]
+if stock_id == "0000":
+    symbol = "^TWII"
+else:
+    symbol = f"{stock_id}.TW"
+watchlist = ["0000","2330","0050","00631L","2327","2383","3532","2303","2344"]
 
 def get_stock_price(stock_id):
     stock = yf.Ticker(stock_id + ".TW")
