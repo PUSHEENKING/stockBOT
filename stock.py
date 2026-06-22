@@ -8,11 +8,32 @@ def get_stock_price(stock_id):
     else:
         symbol = stock_id + ".TW"
 
+    print(f"開始查詢：{symbol}")
+
     try:
         stock = yf.Ticker(symbol)
-        current = float(stock.fast_info["lastPrice"])
-        previous = float(stock.fast_info["regularMarketPreviousClose"])
+
+        fast_info = stock.fast_info
+
+        # 防止空資料
+        if not fast_info:
+            print(f"{stock_id} 無資料")
+            return {
+                "error": f"查無股票代號：{stock_id}"
+            }
+
+        current = fast_info.get("lastPrice")
+        previous = fast_info.get("regularMarketPreviousClose")
+
+        if current is None or previous is None:
+            print(f"{stock_id} 無價格資料")
+            return {
+                "error": f"查無股票代號：{stock_id}"
+            }
+
         percent = ((current - previous) / previous) * 100
+
+        print(f"查詢完成：{symbol}")
 
         return {
             "price": round(current, 2),
@@ -21,7 +42,10 @@ def get_stock_price(stock_id):
 
     except Exception as e:
         print(f"{stock_id} 查詢失敗：{e}")
-        return None
+
+        return {
+            "error": f"查無股票代號：{stock_id}"
+        }
 
 
 def report_watchlist():
@@ -30,8 +54,8 @@ def report_watchlist():
     for stock in watchlist:
         result = get_stock_price(stock)
 
-        if result is None:
-            result_text += f"{stock}\n查詢失敗\n\n"
+        if "error" in result:
+            result_text += f"{result['error']}\n\n"
             continue
 
         result_text += (
@@ -39,4 +63,5 @@ def report_watchlist():
             f"股價：{result['price']}\n"
             f"漲跌幅：{result['percent']}%\n\n"
         )
+
     return result_text
